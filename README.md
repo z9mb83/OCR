@@ -29,6 +29,8 @@ Google Apps Script tooling used by **99 Consulting Services** to turn newspaper 
 | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Every problem hit so far, with cause and fix |
 | [`docs/DLT_TEMPLATES.md`](docs/DLT_TEMPLATES.md) | Registered DLT templates, IDs, and how to add new ones |
 | [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) | Telinfy SMS API — request/response shapes seen in production |
+| [`docs/POSTMAN.md`](docs/POSTMAN.md) | Testing the Telinfy API in Postman (collection, variables, reading responses) |
+| [`postman/Telinfy_SMS.postman_collection.json`](postman/Telinfy_SMS.postman_collection.json) | Importable Postman collection (no key inside) |
 | [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | History of changes |
 
 ## Deployed instances

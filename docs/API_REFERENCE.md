@@ -1,6 +1,6 @@
 # Telinfy SMS API — what we use
 
-Postman collection: *Telinfy – Platforms By GreenAds Global → hub.telinfy.com – APIs & Webhook → SMS*.
+Postman collection: *Telinfy – Platforms By GreenAds Global → hub.telinfy.com – APIs & Webhook → SMS*. How to use it, plus our own importable collection: [POSTMAN.md](POSTMAN.md).
 
 ## Send SMS
 

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-10-24
+- Added Postman guide (`docs/POSTMAN.md`) and importable collection (`postman/`).
 - Repository created: unified `Telinfy_SMS.gs`, OCR scripts for both sheets, full docs.
 
 ## 2026-10-17

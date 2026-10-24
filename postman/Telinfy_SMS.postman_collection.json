@@ -1,0 +1,51 @@
+{
+  "info": {
+    "name": "Telinfy SMS – 99 Consulting (hub.telinfy.com)",
+    "description": "Requests used to test the Telinfy SMS API outside Google Sheets. Set the collection variables api_key, template_id and test_number before sending. NEVER save a real API key into this file in the repo — set it in your local Postman only.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "x-api-key", "type": "string" },
+      { "key": "value", "value": "{{api_key}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://hub.telinfy.com/unified/developer" },
+    { "key": "api_key", "value": "" },
+    { "key": "sender_id", "value": "099559" },
+    { "key": "template_id", "value": "1677100000000395222" },
+    { "key": "test_number", "value": "" },
+    { "key": "message", "value": "Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231." }
+  ],
+  "item": [
+    {
+      "name": "1. Send SMS – single number",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/v1/sms/send",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Sender_Name\": \"{{sender_id}}\",\n  \"SMS_Message\": \"{{message}}\",\n  \"mobile_Number\": \"{{test_number}}\",\n  \"template_id\": \"{{template_id}}\",\n  \"campaign_name\": \"Postman_Test\"\n}"
+        },
+        "description": "Expected 200: {\"responses\":[{\"status\":\"Success\",\"message\":\"SMS send successfully\",\"mobile_Number\":\"…\"}]}. Success = accepted, not delivered — check Telinfy → Campaigns / Reports."
+      }
+    },
+    {
+      "name": "2. Send SMS – bulk (array)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/api/v1/sms/send",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Sender_Name\": \"{{sender_id}}\",\n  \"SMS_Message\": \"{{message}}\",\n  \"mobile_Number\": [\"{{test_number}}\", \"9XXXXXXXXX\"],\n  \"template_id\": \"{{template_id}}\",\n  \"campaign_name\": \"Postman_Bulk_Test\"\n}"
+        },
+        "description": "Replace 9XXXXXXXXX with a second test number you own. Expected 200: {\"status\":\"Success\",\"message\":\"Bulk SMS send successfully\",\"total_numbers\":2,\"bulkResult\":\"Inserted Successfully\"}"
+      }
+    }
+  ]
+}
