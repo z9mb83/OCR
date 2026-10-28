@@ -19,6 +19,8 @@ Google Apps Script tooling used by **99 Consulting Services** to turn newspaper 
 
 ## What's in here
 
+> **New chat / new project?** Load [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md) — it has every ID, template, API detail and rule in one file.
+
 | Path | What it is |
 |---|---|
 | [`src/Telinfy_SMS.gs`](src/Telinfy_SMS.gs) | SMS menu: private API keys, templates tab, dry run / live, bulk send, `sendNext100()`, logging |

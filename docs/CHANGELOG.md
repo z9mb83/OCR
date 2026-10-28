@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-28
+- Removed experimental Telinfy Reports CSV import from the Shaadi script/menu.
+- Added `PROJECT_CONTEXT.md` (portable full-context file).
+
 ## 2026-10-24
 - Added Postman guide (`docs/POSTMAN.md`) and importable collection (`postman/`).
 - Repository created: unified `Telinfy_SMS.gs`, OCR scripts for both sheets, full docs.
