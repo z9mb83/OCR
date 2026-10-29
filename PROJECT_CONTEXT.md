@@ -55,13 +55,14 @@ Sheet URLs: `https://docs.google.com/spreadsheets/d/<spreadsheet id>/edit`
   - `sendTemplateSms_()` — the Telinfy API call; parses `responses[]` / `bulkResult` per number
   - `loadTemplates_()` / `getTemplatesSheet_()` (Property) — templates from the `SMS Templates` tab
   - `extractIndianMobiles_()`, `normalizeIndianMobile_()` — only 10-digit mobiles starting 6–9; rejects 1800 / landlines
+  - `telinfyHistory_()` (29 Oct) — reads Telinfy reports (90 days) before each send: skips DND / not-in-use numbers and numbers already texted with the same template; `smsCheckHistory()` = read-only preview
   - `alreadySentNumbers_` logic — numbers with Sent/Accepted status **plus every number in SMS Logs with Result=OK** are never re-sent
   - `withinPromoWindow_()` — Promotional only 9 AM–9 PM IST
 - Rules: one `onOpen` and one `doPost` per project. OCR `setupHeaders_()` may only write its own header cells (Shaadi A1:C1, Property A1:D1) — never the SMS columns.
 - Reference copies of the code: `src/` in the repo (`Telinfy_SMS.gs` unified version, `OCR_Property.gs`, `OCR_Shaadi.gs`).
 
 ### SMS Status values
-`Sent (queued)` / `Accepted by Telinfy` (accepted, never resent) · `Skipped: duplicate` · `Skipped: invalid number` · `Skipped: missing variable` · `Dry run OK` (eligible again) · `Failed: <reason>` · blank (never tried).
+`Sent (queued)` / `Accepted by Telinfy` (accepted, never resent) · `Skipped: DND` / `Skipped: number not in use` (from Telinfy reports, 29 Oct+) · `Skipped: duplicate` · `Skipped: invalid number` · `Skipped: missing variable` · `Dry run OK` (eligible again) · `Failed: <reason>` · blank (never tried).
 
 ### SMS Logs tab
 `Time | Campaign | Numbers | Result (OK/ERROR/EXCEPTION/DRY_RUN) | HTTP Code | Response`. Source of truth for "already sent" — never delete.
@@ -143,6 +144,7 @@ Responses (200):
 - 2026-10-12 Property: **141 numbers texted twice** — OCR `setupHeaders_` overwrote the SMS Status header. Fixed: OCR writes only its own headers; SMS script also checks SMS Logs.
 - 2026-10-17 NeoDove columns removed from Property. `sendNext100` added; 100 Shaadi (rows 738–843) + 100 Property (rows 424–687) accepted, 0 failed.
 - 2026-10-24 GitHub repo created with code + docs + Postman collection.
+- 2026-10-29 DND / not-in-use skip + Telinfy-history dedupe added to both sheets; SMS Logs numbers now stored as text. Dashboard shows Telinfy SMS reports.
 - 2026-10-28 Experimental "Telinfy Reports" CSV-import feature removed from the Shaadi script and menu (empty "Telinfy Reports" tab may remain).
 
 ---

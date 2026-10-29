@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-29
+- Both sheets: before sending, the script reads Telinfy's delivery reports (last 90 days, read-only) and
+  - skips numbers reported as DND (error 650) → `Skipped: DND`, or not in use / barred (errors 3, 2) → `Skipped: number not in use`, unless the number was delivered at some point;
+  - treats numbers Telinfy already texted with the same template as already sent (catches SMS Logs rows whose number lists Sheets had turned into one big number).
+  - If Telinfy can't be reached, sending continues with the old checks.
+- `SMS Logs` → Numbers are now written as text (`'98…,97…`), so lists are no longer mangled.
+- New read-only `smsCheckHistory()` (run from the editor): shows what the next send would skip. First run: Property 233 unsent rows → 41 DND + 54 already texted would be skipped; Shaadi has no unsent rows.
+- Automation dashboard (separate repo) now shows Telinfy SMS reports per template, DND list and an SMS Excel report.
+
 ## 2026-10-28
 - Removed experimental Telinfy Reports CSV import from the Shaadi script/menu.
 - Added `PROJECT_CONTEXT.md` (portable full-context file).

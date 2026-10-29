@@ -163,6 +163,8 @@ function bulkSend_(rows) {
 
   const data = sh.getRange(1, 1, sh.getLastRow(), lastCol).getValues();
   const alreadySent = alreadySentNumbers_(data, cols);
+  const hist = telinfyHistory_([tpl.text]);   // DND / not in use / already texted, from Telinfy
+  hist.sent.forEach(p => alreadySent.add(p));
 
   const queue = [], skipped = [], seen = new Set();
   rows.forEach(rowNum => {
@@ -173,8 +175,8 @@ function bulkSend_(rows) {
     if (!phones.length) reason = 'Skipped: invalid number';
     const vars = varIdx.map(i => String(r[i] || '').trim());
     if (!reason && vars.some(v => !v)) reason = 'Skipped: missing variable';
-    const fresh = phones.filter(p => !seen.has(p) && !alreadySent.has(p));
-    if (!reason && !fresh.length) reason = 'Skipped: duplicate';
+    const fresh = phones.filter(p => !seen.has(p) && !alreadySent.has(p) && !hist.blocked[p]);
+    if (!reason && !fresh.length) reason = smsSkipReason_(phones, hist);
     if (reason) { skipped.push({ row: rowNum, reason }); return; }
     fresh.forEach(p => { seen.add(p); queue.push({ row: rowNum, phone: p, vars }); });
   });
@@ -213,6 +215,8 @@ function sendNextBatch_(sh, tpl, limit) {
   const cols = getCols_(sh);
   const data = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
   const alreadySent = alreadySentNumbers_(data, cols);
+  const hist = telinfyHistory_([tpl.text]);   // DND / not in use / already texted, from Telinfy
+  hist.sent.forEach(p => alreadySent.add(p));
 
   const queue = [], skipped = [], seen = new Set();
   for (let i = 1; i < data.length && queue.length < limit; i++) {
@@ -220,8 +224,8 @@ function sendNextBatch_(sh, tpl, limit) {
     if (String(r[cols.status - 1] || '').trim() !== '') continue;   // only rows never touched
     const phones = extractIndianMobiles_(r[cols.phone - 1]);
     if (!phones.length) { skipped.push({ row: i + 1, reason: 'Skipped: invalid number' }); continue; }
-    const fresh = phones.filter(p => !seen.has(p) && !alreadySent.has(p));
-    if (!fresh.length) { skipped.push({ row: i + 1, reason: 'Skipped: duplicate' }); continue; }
+    const fresh = phones.filter(p => !seen.has(p) && !alreadySent.has(p) && !hist.blocked[p]);
+    if (!fresh.length) { skipped.push({ row: i + 1, reason: smsSkipReason_(phones, hist) }); continue; }
     if (queue.length + fresh.length > limit) break;
     fresh.forEach(p => { seen.add(p); queue.push({ row: i + 1, phone: p, vars: [] }); });
   }
@@ -471,9 +475,86 @@ function getLogSheet_() {
 }
 
 function logSms_(campaign, numbers, result, code, body) {
-  getLogSheet_().appendRow([new Date(), campaign, numbers.join(','), result, code, String(body).slice(0, 2000)]);
+  // ' keeps the list as text: otherwise Sheets turns "98…,97…" into one big number and the digits are lost
+  getLogSheet_().appendRow([new Date(), campaign, "'" + numbers.join(','), result, code, String(body).slice(0, 2000)]);
 }
 
 function stamp_() {
   return Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyyMMdd_HHmm');
+}
+
+/* ====== TELINFY HISTORY (added 2026-10-29) ======
+ * Before sending, read Telinfy's delivery reports (read-only, one API call) and:
+ *  - skip numbers the operators reported as DND (error 650) or not in use / barred (errors 3, 2),
+ *    unless that number was delivered at some point;
+ *  - treat numbers Telinfy already texted with this sheet's template(s) as already sent
+ *    (covers SMS Logs rows whose number lists were mangled into one big number).
+ * If Telinfy can't be reached, sending continues with the old checks (status column + SMS Logs).
+ */
+const SMS_HISTORY_DAYS = 90;
+
+function telinfyHistory_(texts) {
+  const out = { ok: false, rows: 0, sent: new Set(), blocked: {} };
+  const key = PropertiesService.getScriptProperties().getProperty('TELINFY_API_KEY');
+  if (!key) return out;
+  const day = d => Utilities.formatDate(d, 'Asia/Kolkata', 'yyyy-MM-dd');
+  const from = day(new Date(Date.now() - SMS_HISTORY_DAYS * 86400000)), to = day(new Date());
+  try {
+    const resp = UrlFetchApp.fetch(TELINFY_BASE_URL + '/sms/reports?startDate=' + from + '&endDate=' + to,
+      { headers: { 'x-api-key': key }, muteHttpExceptions: true });
+    const json = JSON.parse(resp.getContentText());
+    if (resp.getResponseCode() !== 200 || !Array.isArray(json.data)) {
+      Logger.log('Telinfy history not available (HTTP ' + resp.getResponseCode() + '): ' + String(json.message || '').slice(0, 100));
+      return out;
+    }
+    const heads = texts.map(t => String(t || '').slice(0, 40)).filter(Boolean);
+    const delivered = new Set();
+    json.data.forEach(x => {
+      const p = normalizeIndianMobile_(x.mobile_number); if (!p) return;
+      const code = Number(x.error_code);
+      if (Number(x.status) === 1) delivered.add(p);
+      else if (code === 650) out.blocked[p] = 'Skipped: DND';
+      else if ((code === 3 || code === 2) && !out.blocked[p]) out.blocked[p] = 'Skipped: number not in use';
+      if (heads.indexOf(String(x.message || '').slice(0, 40)) >= 0) out.sent.add(p);
+    });
+    delivered.forEach(p => delete out.blocked[p]);
+    out.ok = true; out.rows = json.data.length;
+  } catch (e) {
+    Logger.log('Telinfy history not available: ' + String(e).slice(0, 150));
+  }
+  return out;
+}
+
+// Texts of this sheet's templates (Property: SMS Templates tab; Shaadi: SMS_TEMPLATES in this file).
+function smsTemplateTexts_() {
+  const list = typeof loadTemplates_ === 'function' ? loadTemplates_() : Object.keys(SMS_TEMPLATES).map(k => SMS_TEMPLATES[k]);
+  return list.map(t => t.text);
+}
+
+// Status for a row with nothing left to send: the DND / not-in-use reason if one applies, else duplicate.
+function smsSkipReason_(phones, hist) {
+  const b = phones.map(p => hist.blocked[p]).filter(Boolean);
+  return b.length ? b[0] : 'Skipped: duplicate';
+}
+
+/** Read-only check, run from the editor: what the Telinfy history would skip. Sends nothing and changes nothing. */
+function smsCheckHistory() {
+  const hist = telinfyHistory_(smsTemplateTexts_());
+  Logger.log('Telinfy history: ' + (hist.ok ? hist.rows + ' SMS in the last ' + SMS_HISTORY_DAYS + ' days' : 'NOT AVAILABLE') +
+    ' | DND / not-in-use numbers: ' + Object.keys(hist.blocked).length + ' | texted with this sheet\'s template: ' + hist.sent.size);
+  const sh = getExactWorksheet_();
+  const head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(h => String(h).trim());
+  const cPhone = head.indexOf(HDR_PHONE), cStatus = head.indexOf(HDR_STATUS);
+  if (cPhone < 0 || cStatus < 0) return Logger.log('Phone / SMS Status column not found.');
+  const phonesOf = v => (typeof extractIndianMobiles_ === 'function') ? extractIndianMobiles_(v) : [normalizeIndianMobile_(v)].filter(Boolean);
+  let unsent = 0, dnd = 0, dead = 0, dup = 0;
+  sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), sh.getLastColumn()).getValues().forEach(r => {
+    if (String(r[cStatus] || '').trim() !== '') return;
+    const phones = phonesOf(r[cPhone]); if (!phones.length) return;
+    unsent++;
+    if (!phones.every(p => hist.blocked[p] || hist.sent.has(p))) return;
+    const why = smsSkipReason_(phones, hist);
+    why === 'Skipped: DND' ? dnd++ : why === 'Skipped: duplicate' ? dup++ : dead++;
+  });
+  Logger.log('Rows not texted yet: ' + unsent + ' | next send would skip: ' + dnd + ' DND, ' + dead + ' not in use, ' + dup + ' already texted');
 }
