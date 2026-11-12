@@ -6,6 +6,20 @@ Every problem below actually happened while building this. Each entry: **symptom
 
 ## SMS / Telinfy
 
+### Every SMS fails right after switching to a new template
+- **Cause:** the template is registered on DLT but was never added in Telinfy, or Telinfy's saved text differs (one space is enough).
+  Happened with Shaadi `1677100000000395737` (added in Telinfy on 10 Nov 2026).
+- **Fix:** *SMS → Check templates with Telinfy*. ✗ *not in Telinfy* → Telinfy → Templates → Add Template with the same ID, route,
+  sender `099559` and exact text. ✗ *text differs at character N* → correct whichever side is wrong. Run the check again until all ✓.
+
+### "Could not check: Telinfy key missing" / "Telinfy answered HTTP 401"
+- The check uses the same `TELINFY_API_KEY` Script Property as sending. *SMS → API keys…* → paste the key again. 401/403 = key wrong or expired.
+
+### Rows say `Skipped: DND` or `Skipped: number not in use`
+- Telinfy's delivery reports (last 90 days) showed error 650 (DND) or 2/3 (barred / not in use) for that number, and it was never delivered.
+  This is intended: Promotional SMS to these numbers are charged but not delivered. Use a Service template for people who contacted you.
+- To see what the next send would skip without sending: run `smsCheckHistory()` from the editor.
+
 ### All test SMS failed (4/4 "Failed" in the campaign report)
 - **Cause:** No **PE–TM chain** on Tata DLT. Operators reject commercial SMS whose route from the Principal Entity (99 Consulting Services) to the telemarketer (GreenAds/Telinfy) isn't registered.
 - **Fix:** DLT → *PE-TM Binding → Create New Chain* with GreenAds' TM ID. After approval the same test was delivered.

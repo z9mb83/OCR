@@ -32,7 +32,7 @@ Drive images → Sheet (Image | Info | Phone) → OpenAI OCR → Telinfy API →
 | Columns | Image, Info, Phone, SMS Status, SMS Sent At | Image, Info, Phone, Location / Area, SMS Status, SMS Sent At |
 | Other tabs | SMS Logs, (empty "Telinfy Reports" leftover) | SMS Logs, SMS Templates, Webhook Logs (old), Areas Master, Collected Properties + Location View (empty since NeoDove removal), Image Review - Property |
 | Drive folder | `1EaDHoGrpNvGI6NQ3dT-MvZtAU3U3y3P6` | `1LVWSAFpAX_t4YWbK4pFW_1Pyd7c-MXCx` |
-| Template used | Shaadi – Outreach `1677100000000395222` (hard-coded in `SMS_TEMPLATES`) | PEG `1677100000000394325` (row in `SMS Templates` tab) |
+| Template used | Shaadi – Outreach ShaadiBells `1677100000000395737` (row in `SMS Templates` tab; added in Telinfy 10 Nov 2026) | PEG `1677100000000394325` (row in `SMS Templates` tab) |
 | "Sent" status label | `Accepted by Telinfy` | `Sent (queued)` |
 | Send-next-100 | Image OCR menu → "Send Next 100 SMS" (`sendNext100Sms` in Code.gs) / editor `sendNext100` | Editor: `sendNext100` |
 | Phone cells | may contain several numbers ("98…, 97…") — each is texted | one number per row |
@@ -82,7 +82,8 @@ Sheet URLs: `https://docs.google.com/spreadsheets/d/<spreadsheet id>/edit`
 
 | Name | Template ID | Text |
 |---|---|---|
-| Shaadi – Outreach (current) | `1677100000000395222` | Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
+| Shaadi – Outreach ShaadiBells (current) | `1677100000000395737` | Rishtey hi Rishtey ShaadiBells Matrimonial Club Sector 18A Chandigarh, DLF Phase-1 Gurugram, New Jersey USA Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
+| Shaadi – Outreach (Oct, replaced) | `1677100000000395222` | Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
 | Outreach (old Shaadi) | `1677100000000393293` | 99 Consulting Services - Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. Call 9417004832, 9815631231, 7770000559. |
 | 99ConsultingServices | `1677100000000394217` | 99 Consulting Services: Helping businesses improve and scale with IT consulting, managed IT services, SharePoint, identity and access management, cloud and digital solutions. Connect with us for reliable technology support. Call us on 8080803736 or 7770000559 |
 | 99StaffingServices | `1677100000000394219` | 99 Staffing Services: Simplify your hiring with reliable staffing and recruitment support. We help businesses find suitable talent for their workforce requirements across multiple roles and industries. Connect with us for professional hiring assistance. Call us on 8080803736 |

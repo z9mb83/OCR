@@ -54,6 +54,7 @@ function addSmsMenu_() {
     .createMenu('SMS')
     .addItem('API keys…', 'showKeyDialog')
     .addItem('Templates (add / edit)…', 'openTemplatesTab')
+    .addItem('Check templates with Telinfy', 'checkTemplatesWithTelinfy')
     .addSeparator()
     .addItem('Send test SMS (type numbers)', 'menuSendTest')
     .addItem('Bulk send: selected rows', 'menuSendSelected')
@@ -557,4 +558,55 @@ function smsCheckHistory() {
     why === 'Skipped: DND' ? dnd++ : why === 'Skipped: duplicate' ? dup++ : dead++;
   });
   Logger.log('Rows not texted yet: ' + unsent + ' | next send would skip: ' + dnd + ' DND, ' + dead + ' not in use, ' + dup + ' already texted');
+}
+
+
+/* ====== CHECK TEMPLATES WITH TELINFY (read-only, sends nothing) ====== */
+function telinfyTemplateList_() {
+  const key = PropertiesService.getScriptProperties().getProperty('TELINFY_API_KEY');
+  if (!key) throw new Error('Telinfy key missing: SMS → API keys…');
+  const resp = UrlFetchApp.fetch(TELINFY_BASE_URL + '/sms/templates', { headers: { 'x-api-key': key }, muteHttpExceptions: true });
+  if (resp.getResponseCode() !== 200) throw new Error('Telinfy answered HTTP ' + resp.getResponseCode());
+  const found = [];
+  // the response shape is not documented: collect every object that has a 19-digit ID and a long text
+  const walk = v => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (!v || typeof v !== 'object') return;
+    const vals = Object.keys(v).map(k => v[k]);
+    const id = vals.map(x => String(x == null ? '' : x)).find(x => /^\d{19}$/.test(x));
+    const text = vals.filter(x => typeof x === 'string' && x.length > 30 && !/^\d+$/.test(x)).sort((a, b) => b.length - a.length)[0];
+    if (id && text) found.push({ id: id, text: text });
+    vals.forEach(x => { if (x && typeof x === 'object') walk(x); });
+  };
+  walk(JSON.parse(resp.getContentText()));
+  return found;
+}
+
+function smsTemplateReport_() {
+  const sh = getTemplatesSheet_(), telinfy = telinfyTemplateList_(), lines = [];
+  const rows = sh.getLastRow() >= 2 ? sh.getRange(2, 1, sh.getLastRow() - 1, SMS_TEMPLATE_HEADERS.length).getDisplayValues() : [];
+  rows.forEach(r => {
+    const name = String(r[0]).trim(), id = String(r[1]).trim(), text = String(r[4]).trim(), active = String(r[6]).trim();
+    if (!id && !text) return;
+    const label = (name || id) + (active.toLowerCase() === 'no' ? ' (not active)' : '');
+    const t = telinfy.find(x => x.id === id);
+    if (!t) { lines.push('✗ ' + label + ': template ID ' + id + ' is not in Telinfy → add it in Telinfy → Templates.'); return; }
+    if (t.text.trim() === text) { lines.push('✓ ' + label + ': ID and text match Telinfy exactly.'); return; }
+    let i = 0; while (i < text.length && text[i] === t.text.trim()[i]) i++;
+    lines.push('✗ ' + label + ': text differs from Telinfy at character ' + (i + 1) + ' ("…' + text.slice(Math.max(0, i - 15), i + 15) +
+      '…" vs "…' + t.text.trim().slice(Math.max(0, i - 15), i + 15) + '…"). SMS with a different text are rejected.');
+  });
+  return (lines.length ? lines.join('\n') : 'No templates in the SMS Templates tab.') + '\n\n(' + telinfy.length + ' templates found in Telinfy)';
+}
+
+function checkTemplatesWithTelinfy() {
+  const ui = SpreadsheetApp.getUi();
+  try { ui.alert('Templates vs Telinfy', smsTemplateReport_(), ui.ButtonSet.OK); }
+  catch (e) { ui.alert('Could not check: ' + e.message); }
+}
+
+/** Run from the editor: lists the templates the script will use and the Telinfy check. Sends nothing. */
+function smsTemplatesSelfTest() {
+  loadTemplates_().forEach((t, i) => Logger.log((i + 1) + '. ' + t.label + ' | ' + t.templateId + ' | ' + t.senderId + ' | ' + t.route + ' | ' + t.text.length + ' chars'));
+  try { Logger.log(smsTemplateReport_()); } catch (e) { Logger.log('Telinfy check: ' + e.message); }
 }

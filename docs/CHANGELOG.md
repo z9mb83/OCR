@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-12
+- New menu item **SMS → Check templates with Telinfy** (read-only): compares every row of the `SMS Templates` tab with the
+  templates saved in Telinfy and shows ✓ / ✗ per row (missing ID, or the first character where the text differs).
+  `smsTemplatesSelfTest()` (editor) logs the templates in use plus the same check.
+- Shaadi sheet: templates now come from the `SMS Templates` tab (same as Property). Active template:
+  ShaadiBells `1677100000000395737`; it was missing in Telinfy and was added on 10 Nov 2026 (Telinfy username `99consulting`).
+
 ## 2026-10-29
 - Both sheets: before sending, the script reads Telinfy's delivery reports (last 90 days, read-only) and
   - skips numbers reported as DND (error 650) → `Skipped: DND`, or not in use / barred (errors 3, 2) → `Skipped: number not in use`, unless the number was delivered at some point;

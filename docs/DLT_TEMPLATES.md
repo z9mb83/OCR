@@ -5,7 +5,8 @@ Principal Entity: **99 Consulting Services** · Header / Sender ID: **`099559`**
 | Name | Template ID | Route | Vars | Used by | In Telinfy |
 |---|---|---|---|---|---|
 | Outreach (old Shaadi) | `1677100000000393293` | Promotional | 0 | — (replaced) | Yes |
-| Shaadi – Outreach | `1677100000000395222` | Promotional | 0 | Shaadi sheet | Yes |
+| Shaadi – Outreach (ShaadiBells) | `1677100000000395737` | Promotional | 0 | Shaadi sheet (since Nov 2026) | Yes (added 10 Nov 2026) |
+| Shaadi – Outreach (Oct) | `1677100000000395222` | Promotional | 0 | — (replaced) | Yes |
 | 99ConsultingServices | `1677100000000394217` | Promotional | 0 | Tests | Yes |
 | 99StaffingServices | `1677100000000394219` | Promotional | 0 | Tests | Yes |
 | PEG (Property Experts Group) | `1677100000000394325` | Promotional | 0 | Property sheet | Yes |
@@ -13,7 +14,10 @@ Principal Entity: **99 Consulting Services** · Header / Sender ID: **`099559`**
 
 ## Approved texts (must be sent exactly)
 
-**Shaadi – Outreach** `1677100000000395222`
+**Shaadi – Outreach (ShaadiBells)** `1677100000000395737` (2 SMS)
+> Rishtey hi Rishtey ShaadiBells Matrimonial Club Sector 18A Chandigarh, DLF Phase-1 Gurugram, New Jersey USA Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231.
+
+**Shaadi – Outreach (Oct)** `1677100000000395222`
 > Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231.
 
 **Outreach (old)** `1677100000000393293` — 170 chars (2 SMS)
@@ -34,9 +38,10 @@ Principal Entity: **99 Consulting Services** · Header / Sender ID: **`099559`**
 ## Adding a new template
 
 1. **DLT** → *Content Template Registration* → fill and submit → wait for **Active** + Template ID.
-2. **Telinfy** → *Templates → Add Template* → same ID, route, sender, **exact** text → Save → re-check the saved text in the list.
-3. **Sheet** → *SMS → Templates (add / edit)…* → add a row (Active = Yes).
-4. *SMS → Send test SMS* to your own number in Live mode → check *Telinfy → Campaigns* after ~15 min.
+2. **Telinfy** (log in with username `99consulting`) → *Templates → Add Template* → same ID, route, sender, **exact** text → Save → re-check the saved text in the list.
+3. **Sheet** → *SMS → Templates (add / edit)…* → add a row (Active = Yes). Paste the ID as plain text.
+4. **Sheet** → *SMS → Check templates with Telinfy* → every row should show ✓ (ID found and text identical). ✗ "not in Telinfy" = do step 2; ✗ "text differs at character N" = fix the text in the tab or in Telinfy.
+5. *SMS → Send test SMS* to your own number in Live mode → check *Telinfy → Campaigns* after ~15 min.
 
 ## Writing templates that get approved
 
