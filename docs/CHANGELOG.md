@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-12
+- New menu item **SMS → Check templates with Telinfy** (read-only): compares every row of the `SMS Templates` tab with the
+  templates saved in Telinfy and shows ✓ / ✗ per row (missing ID, or the first character where the text differs).
+  `smsTemplatesSelfTest()` (editor) logs the templates in use plus the same check.
+- Shaadi sheet: templates now come from the `SMS Templates` tab (same as Property). Active template:
+  ShaadiBells `1677100000000395737`; it was missing in Telinfy and was added on 10 Nov 2026 (Telinfy username `99consulting`).
+
+## 2026-10-29
+- Both sheets: before sending, the script reads Telinfy's delivery reports (last 90 days, read-only) and
+  - skips numbers reported as DND (error 650) → `Skipped: DND`, or not in use / barred (errors 3, 2) → `Skipped: number not in use`, unless the number was delivered at some point;
+  - treats numbers Telinfy already texted with the same template as already sent (catches SMS Logs rows whose number lists Sheets had turned into one big number).
+  - If Telinfy can't be reached, sending continues with the old checks.
+- `SMS Logs` → Numbers are now written as text (`'98…,97…`), so lists are no longer mangled.
+- New read-only `smsCheckHistory()` (run from the editor): shows what the next send would skip. First run: Property 233 unsent rows → 41 DND + 54 already texted would be skipped; Shaadi has no unsent rows.
+- Automation dashboard (separate repo) now shows Telinfy SMS reports per template, DND list and an SMS Excel report.
+
 ## 2026-10-28
 - Removed experimental Telinfy Reports CSV import from the Shaadi script/menu.
 - Added `PROJECT_CONTEXT.md` (portable full-context file).

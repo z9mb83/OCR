@@ -32,7 +32,7 @@ Drive images → Sheet (Image | Info | Phone) → OpenAI OCR → Telinfy API →
 | Columns | Image, Info, Phone, SMS Status, SMS Sent At | Image, Info, Phone, Location / Area, SMS Status, SMS Sent At |
 | Other tabs | SMS Logs, (empty "Telinfy Reports" leftover) | SMS Logs, SMS Templates, Webhook Logs (old), Areas Master, Collected Properties + Location View (empty since NeoDove removal), Image Review - Property |
 | Drive folder | `1EaDHoGrpNvGI6NQ3dT-MvZtAU3U3y3P6` | `1LVWSAFpAX_t4YWbK4pFW_1Pyd7c-MXCx` |
-| Template used | Shaadi – Outreach `1677100000000395222` (hard-coded in `SMS_TEMPLATES`) | PEG `1677100000000394325` (row in `SMS Templates` tab) |
+| Template used | Shaadi – Outreach ShaadiBells `1677100000000395737` (row in `SMS Templates` tab; added in Telinfy 10 Nov 2026) | PEG `1677100000000394325` (row in `SMS Templates` tab) |
 | "Sent" status label | `Accepted by Telinfy` | `Sent (queued)` |
 | Send-next-100 | Image OCR menu → "Send Next 100 SMS" (`sendNext100Sms` in Code.gs) / editor `sendNext100` | Editor: `sendNext100` |
 | Phone cells | may contain several numbers ("98…, 97…") — each is texted | one number per row |
@@ -55,13 +55,14 @@ Sheet URLs: `https://docs.google.com/spreadsheets/d/<spreadsheet id>/edit`
   - `sendTemplateSms_()` — the Telinfy API call; parses `responses[]` / `bulkResult` per number
   - `loadTemplates_()` / `getTemplatesSheet_()` (Property) — templates from the `SMS Templates` tab
   - `extractIndianMobiles_()`, `normalizeIndianMobile_()` — only 10-digit mobiles starting 6–9; rejects 1800 / landlines
+  - `telinfyHistory_()` (29 Oct) — reads Telinfy reports (90 days) before each send: skips DND / not-in-use numbers and numbers already texted with the same template; `smsCheckHistory()` = read-only preview
   - `alreadySentNumbers_` logic — numbers with Sent/Accepted status **plus every number in SMS Logs with Result=OK** are never re-sent
   - `withinPromoWindow_()` — Promotional only 9 AM–9 PM IST
 - Rules: one `onOpen` and one `doPost` per project. OCR `setupHeaders_()` may only write its own header cells (Shaadi A1:C1, Property A1:D1) — never the SMS columns.
 - Reference copies of the code: `src/` in the repo (`Telinfy_SMS.gs` unified version, `OCR_Property.gs`, `OCR_Shaadi.gs`).
 
 ### SMS Status values
-`Sent (queued)` / `Accepted by Telinfy` (accepted, never resent) · `Skipped: duplicate` · `Skipped: invalid number` · `Skipped: missing variable` · `Dry run OK` (eligible again) · `Failed: <reason>` · blank (never tried).
+`Sent (queued)` / `Accepted by Telinfy` (accepted, never resent) · `Skipped: DND` / `Skipped: number not in use` (from Telinfy reports, 29 Oct+) · `Skipped: duplicate` · `Skipped: invalid number` · `Skipped: missing variable` · `Dry run OK` (eligible again) · `Failed: <reason>` · blank (never tried).
 
 ### SMS Logs tab
 `Time | Campaign | Numbers | Result (OK/ERROR/EXCEPTION/DRY_RUN) | HTTP Code | Response`. Source of truth for "already sent" — never delete.
@@ -81,7 +82,8 @@ Sheet URLs: `https://docs.google.com/spreadsheets/d/<spreadsheet id>/edit`
 
 | Name | Template ID | Text |
 |---|---|---|
-| Shaadi – Outreach (current) | `1677100000000395222` | Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
+| Shaadi – Outreach ShaadiBells (current) | `1677100000000395737` | Rishtey hi Rishtey ShaadiBells Matrimonial Club Sector 18A Chandigarh, DLF Phase-1 Gurugram, New Jersey USA Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
+| Shaadi – Outreach (Oct, replaced) | `1677100000000395222` | Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. 99 Consulting Services Shaadi-bells.com Call 7770000559, 9417004832, 9815631231. |
 | Outreach (old Shaadi) | `1677100000000393293` | 99 Consulting Services - Elite Matrimonial Solutions. Confidential Matchmaking with 30+ Years Experience. Sector 18A, Chandigarh. Call 9417004832, 9815631231, 7770000559. |
 | 99ConsultingServices | `1677100000000394217` | 99 Consulting Services: Helping businesses improve and scale with IT consulting, managed IT services, SharePoint, identity and access management, cloud and digital solutions. Connect with us for reliable technology support. Call us on 8080803736 or 7770000559 |
 | 99StaffingServices | `1677100000000394219` | 99 Staffing Services: Simplify your hiring with reliable staffing and recruitment support. We help businesses find suitable talent for their workforce requirements across multiple roles and industries. Connect with us for professional hiring assistance. Call us on 8080803736 |
@@ -143,6 +145,7 @@ Responses (200):
 - 2026-10-12 Property: **141 numbers texted twice** — OCR `setupHeaders_` overwrote the SMS Status header. Fixed: OCR writes only its own headers; SMS script also checks SMS Logs.
 - 2026-10-17 NeoDove columns removed from Property. `sendNext100` added; 100 Shaadi (rows 738–843) + 100 Property (rows 424–687) accepted, 0 failed.
 - 2026-10-24 GitHub repo created with code + docs + Postman collection.
+- 2026-10-29 DND / not-in-use skip + Telinfy-history dedupe added to both sheets; SMS Logs numbers now stored as text. Dashboard shows Telinfy SMS reports.
 - 2026-10-28 Experimental "Telinfy Reports" CSV-import feature removed from the Shaadi script and menu (empty "Telinfy Reports" tab may remain).
 
 ---

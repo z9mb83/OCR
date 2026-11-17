@@ -39,7 +39,7 @@ Google Apps Script tooling used by **99 Consulting Services** to turn newspaper 
 
 | Sheet | Data tab | Template used | Status label |
 |---|---|---|---|
-| Shaadi NeoDove | `Sheet1` | Shaadi – Outreach (`1677100000000395222`) | `Accepted by Telinfy` |
+| Shaadi NeoDove | `Sheet1` | Shaadi – Outreach ShaadiBells (`1677100000000395737`) | `Accepted by Telinfy` |
 | Property NeoDove | `Ads` | PEG (`1677100000000394325`) | `Sent (queued)` |
 
 Both sheets use sender ID / header **`099559`** on the **Promotional** route.
@@ -50,10 +50,18 @@ Both sheets use sender ID / header **`099559`** on the **Promotional** route.
 2. Add the matching `OCR_*.gs` as `Code.gs` and `src/Telinfy_SMS.gs` as a second file.
 3. Fill in `SPREADSHEET_ID`, `DRIVE_FOLDER_ID`, `TARGET_SHEET_GID` (and `DATA_TAB_NAME` in `Telinfy_SMS.gs`).
 4. Reload the sheet → **SMS → API keys…** → paste the OpenAI and Telinfy keys.
-5. **SMS → Templates (add / edit)…** → add your DLT template row.
+5. **SMS → Templates (add / edit)…** → add your DLT template row, then **SMS → Check templates with Telinfy** (all rows must show ✓).
 6. Test in **Dry run**, then **SMS → Mode: switch Live / Dry run**.
 
 Full details: [docs/SETUP.md](docs/SETUP.md).
+
+## Logins
+
+| What | Where | Login |
+|---|---|---|
+| Telinfy (SMS sending, templates, reports) | https://hub.telinfy.com | username `99consulting` (password: ask the admin, never in this repo) |
+| DLT (template registration) | Tata Tele DLT portal | Principal Entity login |
+| Sheets / Apps Script | Google | linkwithmarketing account |
 
 ## Safety rules built in
 
@@ -61,6 +69,7 @@ Full details: [docs/SETUP.md](docs/SETUP.md).
 - New installs start in **Dry run**; nothing is sent until you switch to Live.
 - A number is never texted twice: the script checks the SMS Status column **and** the full `SMS Logs` history.
 - Promotional templates are blocked outside **9 AM – 9 PM IST**.
+- Numbers Telinfy reported as DND or not in use (last 90 days) are skipped (`Skipped: DND`).
 - 1800 toll-free numbers, landlines and malformed numbers are skipped.
 - OCR scripts only write their own header cells, so they can't overwrite the SMS columns.
 
