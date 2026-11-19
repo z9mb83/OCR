@@ -23,6 +23,10 @@ DLT-approved promotional SMS through **Telinfy** (GreenAds Global, login usernam
 - Keep this project's sheets separate from the Automation Control Center; its SMS reports are shown on the dashboard
   (repo `automation-dashboard`, SMS page, split per template).
 - 19 Nov 2026: repo copied to GitHub z9mb83 with full history.
+- 19 Nov 2026: `src/SmsApi.gs` added to both Apps Script projects (`SMS_API_BRAND` = `SB` / `PE`), deployed as a web app
+  (Execute as Me, access Anyone, `?key=` = Script Property `SMS_API_KEY`, menu SMS → Dashboard access key). The dashboard's
+  **Send SMS** page calls `status` and `sendnext` (= the sheet's own Send Next 100). It refuses Dry run and outside 9 AM - 9 PM.
+  Only one `doPost`/`doGet` per project: they live in SmsApi.gs.
 
 ## Owner and how to work with him
 

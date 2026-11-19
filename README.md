@@ -24,6 +24,7 @@ Google Apps Script tooling used by **99 Consulting Services** to turn newspaper 
 | Path | What it is |
 |---|---|
 | [`src/Telinfy_SMS.gs`](src/Telinfy_SMS.gs) | SMS menu: private API keys, templates tab, dry run / live, bulk send, `sendNext100()`, logging |
+| [`src/SmsApi.gs`](src/SmsApi.gs) | Web app for the dashboard's **Send SMS → Send next 100** button (19 Nov 2026). Same file in both projects, only `SMS_API_BRAND` differs (`SB` Shaadi, `PE` Property). Runs the sheet's own `sendNextBatch_`; key from menu **SMS → Dashboard access key** |
 | [`src/OCR_Property.gs`](src/OCR_Property.gs) | Image OCR for the **Property** sheet (Image, Info, Phone, Location / Area) |
 | [`src/OCR_Shaadi.gs`](src/OCR_Shaadi.gs) | Image OCR for the **Shaadi** (matrimonial) sheet (Image, Info, Phone) |
 | [`docs/SETUP.md`](docs/SETUP.md) | Step-by-step install: DLT, Telinfy, Apps Script, keys, templates |
