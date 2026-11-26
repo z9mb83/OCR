@@ -181,16 +181,19 @@ function smsApiBulkAdd_(body) {
 /* ====== Automatic batches (26 Nov 2026) ======
  * Every 30 minutes the sheet's own Send Next 100 runs by itself (same function as the dashboard button), so new
  * numbers from the OCR are picked up on the next run and every rule still applies: never re-text a number, skip DND /
- * not-in-use numbers, only 9 AM - 9 PM IST, nothing in Dry run. Outside those hours or in Dry run a run sends nothing.
+ * not-in-use numbers, nothing in Dry run. Automatic runs only 10:00 - 17:00 IST (SMS_AUTO_HOURS); outside or in Dry run a run sends nothing.
  * Menu (add to addSmsMenu_): .addItem('Automatic SMS ON (100 every 30 min)', 'smsAutoOn') .addItem('Automatic SMS OFF', 'smsAutoOff')
  * Last result: Script Property SMS_AUTO_LAST, and every send is in the SMS Logs tab as usual.
  */
 const SMS_AUTO_HANDLER = 'smsAutoTick';
 const SMS_AUTO_MINUTES = 30;
+const SMS_AUTO_HOURS = [10, 17];   // automatic runs only from 10:00 to 16:59 IST (owner, 26 Nov 2026); the buttons keep 9 AM - 9 PM
 
 function smsAutoTick() {
   let line;
+  const hour = Number(Utilities.formatDate(new Date(), 'Asia/Kolkata', 'H'));
   try {
+    if (hour < SMS_AUTO_HOURS[0] || hour >= SMS_AUTO_HOURS[1]) throw new Error('outside the automatic hours ' + SMS_AUTO_HOURS[0] + ':00 - ' + SMS_AUTO_HOURS[1] + ':00');
     const r = smsApiSendNext_();
     line = 'sent ' + r.sent + ', failed ' + r.failed + ', skipped ' + r.skipped;
   } catch (e) {
@@ -205,7 +208,7 @@ function smsAutoOn() {
   smsAutoOff_();
   ScriptApp.newTrigger(SMS_AUTO_HANDLER).timeBased().everyMinutes(SMS_AUTO_MINUTES).create();
   SpreadsheetApp.getUi().alert('Automatic SMS is ON: up to ' + SMS_API_LIMIT + ' every ' + SMS_AUTO_MINUTES +
-    ' minutes, 9 AM - 9 PM.\nMode: ' + (isDryRun_() ? 'DRY RUN (nothing will be sent until you switch to Live)' : 'LIVE'));
+    ' minutes, ' + SMS_AUTO_HOURS[0] + ':00 - ' + SMS_AUTO_HOURS[1] + ':00.\nMode: ' + (isDryRun_() ? 'DRY RUN (nothing will be sent until you switch to Live)' : 'LIVE'));
 }
 
 function smsAutoOff() {
