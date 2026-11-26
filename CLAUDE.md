@@ -27,6 +27,12 @@ DLT-approved promotional SMS through **Telinfy** (GreenAds Global, login usernam
   (Execute as Me, access Anyone, `?key=` = Script Property `SMS_API_KEY`, menu SMS → Dashboard access key). The dashboard's
   **Send SMS** page calls `status` and `sendnext` (= the sheet's own Send Next 100). It refuses Dry run and outside 9 AM - 9 PM.
   Only one `doPost`/`doGet` per project: they live in SmsApi.gs.
+- 26 Nov 2026: automatic SMS batches added to `src/SmsApi.gs` in both live projects and kept **OFF**: menu SMS → *Automatic SMS ON
+  (100 every 30 min)* / *Automatic SMS OFF* (time trigger `smsAutoTick`, runs the same Send Next 100, so all rules above apply;
+  outside 9 AM - 9 PM or in Dry run a run sends nothing). Last result: Script Property `SMS_AUTO_LAST`; sends in SMS Logs.
+- 26 Nov 2026: `SmsApi.gs` action `bulkadd` (POST): the dashboard's Send SMS page uploads a phone list; new numbers are added below the
+  last row (A = `Upload: <file> (<date>)`, B = name, Phone), numbers already in the tab are skipped, existing rows never change.
+  The OCR skips these rows (no image file ID). Web app redeployed as a new version of the same deployment (same /exec link).
 
 ## All links (updated 19 Nov 2026)
 
@@ -36,7 +42,7 @@ DLT-approved promotional SMS through **Telinfy** (GreenAds Global, login usernam
 | Automation dashboard (WhatsApp, Email, SMS, reports) | https://automation-dashboard-pi-ten.vercel.app | https://vercel.com/ace-5891/automation-dashboard |
 | Send WhatsApp / Send Email / Send SMS pages | `.../#send`, `.../#email`, `.../#send-sms` | (same) |
 | Task tracker (sign-in: Admin / Task manager / Employee) | https://task-tracker-five-taupe.vercel.app (`/admin`, `/task-manager`, `/employee`) | https://vercel.com/ace-5891/task-tracker |
-| Old addresses (old Vercel account, retired; delete when no longer needed) | automation-dashboard-sigma-rose.vercel.app, task-tracker-sable-omega.vercel.app | old account |
+| Old addresses (old Vercel account) | deleted 19-20 Nov 2026 | - |
 
 Every push to `main` of the z9mb83 repo redeploys that site. Vercel settings (Settings → Environment Variables), values only in Vercel:
 - automation-dashboard: `SHEET_API_URL`, `SHEET_API_KEY`, `DASHBOARD_PASSWORD`, `TELINFY_API_KEY`, `SMS_SB_URL`, `SMS_SB_KEY`, `SMS_PE_URL`, `SMS_PE_KEY`
