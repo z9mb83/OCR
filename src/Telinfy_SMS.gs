@@ -59,6 +59,8 @@ function addSmsMenu_() {
     .addItem('Send test SMS (type numbers)', 'menuSendTest')
     .addItem('Bulk send: selected rows', 'menuSendSelected')
     .addItem('Bulk send: all unsent rows', 'menuSendAllUnsent')
+    .addItem('Automatic SMS ON (100 every 30 min)', 'smsAutoOn')
+    .addItem('Automatic SMS OFF', 'smsAutoOff')
     .addSeparator()
     .addItem('Mode: switch Live / Dry run', 'toggleDryRun')
     .addToUi();
