@@ -30,6 +30,8 @@ DLT-approved promotional SMS through **Telinfy** (GreenAds Global, login usernam
 - 26 Nov 2026: automatic SMS batches added to `src/SmsApi.gs` in both live projects and kept **OFF**: menu SMS → *Automatic SMS ON
   (100 every 30 min)* / *Automatic SMS OFF* (time trigger `smsAutoTick`, runs the same Send Next 100, so all rules above apply;
   outside 9 AM - 9 PM or in Dry run a run sends nothing). Last result: Script Property `SMS_AUTO_LAST`; sends in SMS Logs.
+- 26 Nov 2026 (go-live): automatic SMS runs only 10:00 - 17:00 IST (`SMS_AUTO_HOURS` in SmsApi.gs; the buttons keep 9 AM - 9 PM).
+  Switched ON by the owner on 26 Nov 2026 (trigger owned by the linkwithmarketing account).
 - 26 Nov 2026: `SmsApi.gs` action `bulkadd` (POST): the dashboard's Send SMS page uploads a phone list; new numbers are added below the
   last row (A = `Upload: <file> (<date>)`, B = name, Phone), numbers already in the tab are skipped, existing rows never change.
   The OCR skips these rows (no image file ID). Web app redeployed as a new version of the same deployment (same /exec link).
