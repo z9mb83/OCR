@@ -87,7 +87,12 @@ function smsApiStatus_() {
   return {
     brand: SMS_API_BRAND, sheet: SpreadsheetApp.getActive().getName(), template: t.tpl ? t.tpl.label : '',
     live: !isDryRun_(), window: t.tpl ? withinPromoWindow_(t.tpl) : false, limit: SMS_API_LIMIT,
-    waiting: waiting, sentToday: sentToday, sent: sent, failed: failed, skipped: skipped
+    waiting: waiting, sentToday: sentToday, sent: sent, failed: failed, skipped: skipped,
+    // owner's "what is switched on" panel (26 Nov 2026): template details + the automatic 30-minute sending
+    templateId: t.tpl ? String(t.tpl.templateId || '') : '', templateText: t.tpl ? String(t.tpl.text || '') : '',
+    sender: t.tpl ? String(t.tpl.senderId || '') : '',
+    auto: ScriptApp.getProjectTriggers().some(x => x.getHandlerFunction() === 'smsAutoTick'),
+    autoHours: SMS_AUTO_HOURS.join('-'), autoLast: PropertiesService.getScriptProperties().getProperty('SMS_AUTO_LAST') || ''
   };
 }
 
